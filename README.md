@@ -38,7 +38,7 @@ Planner가 반환한 Plan(JSON)을 받아 실제 Tool을 실행
 # **아키텍처**
 
 <p align="center">
-  <img src="assets/agent_architecture.png" width="760" />
+  <img src="app/assets/agent_architecture.png" width="760" />
 </p>
 
 
