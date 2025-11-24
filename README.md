@@ -57,18 +57,18 @@ Planner가 반환한 Plan(JSON)을 받아 실제 Tool을 실행
 ```bash
 RulebaseAgent/
 ├─ app/
-│ ├─ main.py # FastAPI 서버 & Agent 루프
-│ ├─ config.py # OpenAI Client, MODEL_NAME
-│ ├─ data/
-│ │ └─ rules_sample.json
-│ ├─ agent/
-│ ├─ planner.py # LLM 기반 Plan 생성
-│ ├─ executor.py # Tool 실행 오케스트레이션
-│ ├─ memory.py # 최근 대화 N턴 저장
-│ └─ tools/
-│ ├─ search_tool.py
-│ ├─ summarize_tool.py
-│ └─ clause_tool.py
+│   ├─ main.py # FastAPI 서버 & Agent 루프
+│   ├─ config.py # OpenAI Client, MODEL_NAME
+│   ├─ data/
+│   │   └─ rules_sample.json
+│   ├─ agent/
+│   ├─ planner.py # LLM 기반 Plan 생성
+│   ├─ executor.py # Tool 실행 오케스트레이션
+│   ├─ memory.py # 최근 대화 N턴 저장
+│   └─ tools/
+│       ├─ search_tool.py
+│       ├─ summarize_tool.py
+│       └─ clause_tool.py
 ├─ requirements.txt
 ├─ .env
 └─ README.md
