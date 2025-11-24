@@ -41,7 +41,16 @@ Planner가 반환한 Plan(JSON)을 받아 실제 Tool을 실행
   <img src="app/assets/agent_architecture.png" width="760" />
 </p>
 
+위 아키텍처는 RulebaseAgent가 동작하는 전체 흐름을 나타냅니다.
 
+1. **Client(사용자)** 가 /agent 엔드포인트로 질의를 전달  
+2. **FastAPI Agent 서버**는 질의와 Memory(컨텍스트)를 함께 Planner에 전달  
+3. **Planner(LLM 기반)** 는 JSON 형태의 “행동 계획(Action Plan)”을 생성  
+4. **Executor** 가 Planner의 계획을 해석하고 적절한 Tool을 실행  
+5. **Search / Summarize / Clause / Final Summarizer** 도구들이 상황에 따라 호출  
+6. 여러 번 반복되는 loop를 통해 필요한 만큼 도구를 조합하여 추론  
+7. 최종적으로 **Final Answer** 생성  
+8. 답변은 **Memory**에 저장되어 다음 Planner 호출 시 context로 활용됨  
 ---
 
 # **프로젝트 구조**
