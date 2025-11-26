@@ -1,48 +1,37 @@
-from typing import Dict, Any, List
+# app/agent/executor.py
+from __future__ import annotations
 
-from app.agent.tools import SearchTool, SummarizeTool, ClauseTool
+from typing import Dict, Any
+
+from app.agent.tools.base import Tool
 
 
 class Executor:
-    """
-    Planner가 내린 계획에 따라 실제 Tool을 실행하는 모듈.
-    """
+    def __init__(self, tool_registry: Dict[str, Tool]):
+        self.tool_registry = tool_registry
 
-    def __init__(self, search_tool: SearchTool, summarize_tool: SummarizeTool, clause_tool: ClauseTool):
-        self.search_tool = search_tool
-        self.summarize_tool = summarize_tool
-        self.clause_tool = clause_tool
-
-    def execute(self, plan: Dict[str, Any], user_query: str) -> Dict[str, Any]:
-        tool = plan.get("tool")
-        tool_input = plan.get("tool_input") or {}
-        result: Any = None
-
-        if tool == "search":
-            query = tool_input.get("query", user_query)
-            result = self.search_tool.run(query=query)
-        elif tool == "summarize":
-            docs: List[str] = tool_input.get("texts", [])
-            if not docs:
-                result = "summarize 할 텍스트가 없습니다."
-            else:
-                result = self.summarize_tool.run(texts=docs, user_query=user_query)
-        elif tool == "extract_clause":
-            docs: List[str] = tool_input.get("texts", [])
-            if not docs:
-                result = "추출할 규정 텍스트가 없습니다."
-            else:
-                result = self.clause_tool.run(texts=docs, user_query=user_query)
-        elif tool == "final_answer":
-            # final_answer는 executor에서 별도 처리 없이 plan 자체에 들어있다고 가정할 수도 있음.
+    def execute(self, plan: Dict[str, Any], user_query: str) -> Dict[str, Any]:        
+        tool_name: str = plan.get("tool", "")
+        tool_input: Dict[str, Any] = plan.get("tool_input", {}) or {}
+        
+        if tool_name == "final_answer":
             result = tool_input.get("answer", "별도의 최종 답변이 제공되지 않았습니다.")
-        else:
-            result = f"알 수 없는 tool: {tool}"
+            is_final = True
 
+        else:
+            tool = self.tool_registry.get(tool_name)
+            if tool is None:
+                result = f"알 수 없는 tool: {tool_name}"
+                is_final = True  # 더 진행해봐야 의미 없으니 종료
+            else:
+                try:
+                    result = tool.run(user_query=user_query, tool_input=tool_input)
+                except Exception as e:
+                    result = {"error": f"'{tool_name}' 실행 중 오류 발생: {e}"}
         return {
-            "tool": tool,
+            "tool": tool_name,
             "tool_input": tool_input,
             "output": result,
             "reason": plan.get("reason", ""),
-            "is_final": plan.get("is_final", False),
+            "is_final": is_final,
         }
